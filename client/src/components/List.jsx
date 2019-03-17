@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 import ListEntry from './ListEntry';
 
@@ -7,7 +8,7 @@ class List extends Component {
     super(props);
     this.state = {
       todo: '',
-      todos: ['eat', 'sleep', 'code'],
+      todos: [],
     };
     this.getTodos = this.getTodos.bind(this);
     this.postTodo = this.postTodo.bind(this);
@@ -21,12 +22,37 @@ class List extends Component {
   }
 
   getTodos() {
+    axios
+      .get('/api')
+      .then((response) => {
+        console.log(response)
+        this.setState({
+          todos: response.data
+        });
+      })
+      .catch((error => console.log(error)))
   }
 
   postTodo(todo) {
+    axios
+      .post('api', { todo })
+      .then((response) => {
+        this.setState({
+          todos:response.data
+        });
+      })
+      .catch(error => console.log(error))
   }
 
   deleteTodo(index) {
+    axios 
+      .delete('/api', { params: { index: index }})
+      .then((response) => {
+        this.setState({
+          todos: response.data,
+          todo: ''
+        })
+      })
   }
 
   handleChange(event) {
@@ -53,7 +79,7 @@ class List extends Component {
         <div>
           {this.state.todos.map((todo, index) => (
             <ListEntry
-              key={index}
+              key={index} //each child in a list should have a unique key prop.
               index={index}
               name={todo}
               deleteTodo={this.deleteTodo}
